@@ -66,6 +66,10 @@ def flush_to_disk(arr_images, arr_keys):
             y = 1
         if key == mouse.Button.right: 
             y = 2
+        if key == Key.space: 
+            y = 3
+        if hasattr(key, 'char') and key.char == 'f': 
+            y = 4
         arr_y.append(y)
         arr_img_file_i.append(i)
         cv2.imwrite('images/original/%s_%s.png' % (time_column, i), 
@@ -135,16 +139,24 @@ def main_loop():
 
 
 global_current_key = None
+def on_release(key): 
+    global global_current_key 
+    global_current_key = None
+
 def on_press(key):
-    # global global_current_key
+    global global_current_key
     global global_is_running
     print('on_press key: ', key)
     try:
-        if key == Key.esc: 
-            log.info('The user presses Esc in the game, will terminate.')
+        if key == Key.backspace: 
+            log.info('The user presses backspace in the game, will terminate.')
             os._exit(0)
 
-        # global_current_key = key
+        if key == Key.space: 
+            global_current_key = key
+
+        if hasattr(key, 'char') and key.char == 'f': 
+            global_current_key = key
 
         if hasattr(key, 'char') and key.char == ']': 
             # switch the switch
@@ -169,9 +181,9 @@ def on_click(x, y, button, pressed):
 def main():
     signal.signal(signal.SIGINT, signal_handler)
 
-    keyboard_listener = Listener(on_press=on_press)
+    keyboard_listener = Listener(on_press=on_press, on_release=on_release)
     keyboard_listener.start()
-    log.info('keyboard listener setup. press Esc to exit')
+    log.info('keyboard listener setup. press backspace to exit')
 
     mouse_listener = mouse.Listener(on_click=on_click)
     mouse_listener.start()

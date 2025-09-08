@@ -14,6 +14,16 @@ actions:
   RELEASE_PARRY: 
     - ['release_mouse', 'right']
 
+  SHIPO: 
+    - ['press', 'space']
+    - ['delay', 0.1]
+    - ['release', 'space']
+
+  JUMP: 
+    - ['press', 'f']
+    - ['delay', 0.1]
+    - ['release', 'f']
+
   GUI_FUO: &GUI_FUO
     - ['press', 'p']
     - ['delay', 0.1]

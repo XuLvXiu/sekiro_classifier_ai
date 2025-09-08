@@ -42,7 +42,7 @@ if os.path.exists(test_dir):
 
 os.mkdir(train_dir)
 os.mkdir(test_dir)
-for i in [0, 1, 2]: 
+for i in range(0, len(arr_y_grouped_count)): 
     os.mkdir('%s/%s' % (train_dir, i))
     os.mkdir('%s/%s' % (test_dir, i))
 
@@ -55,7 +55,7 @@ for index, row in df.iterrows():
     obj_file_name_to_y[img_file_name] = y
 
 file_count = 0
-arr_file_count = [0, 0, 0]
+arr_file_count = [0 for i in range(0, len(arr_y_grouped_count))]
 for file_name in os.listdir(original_dir): 
     # train-test: 70-30
     to_dir = train_dir
@@ -170,7 +170,7 @@ if torch.cuda.is_available():
 # total_loss = 0
 correct_count = 0
 total_count = 0
-base_counter = {'0': 0, '1': 0, '2': 0}
+base_counter = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0}
 obj_predicted_count = base_counter.copy()
 obj_accuracy = base_counter.copy()
 obj_correct_count = base_counter.copy()
@@ -206,7 +206,7 @@ with torch.no_grad():
             if pred_y == label: 
                 obj_correct_count[str(pred_y)] += 1
 
-for i in ['0', '1', '2']: 
+for i in ['0', '1', '2', '3', '4']: 
     obj_accuracy[i] = obj_correct_count[i] / (1 + obj_total_count[i])
 
 print('eval accuracy: ', correct_count / total_count, ', correct_count:', correct_count, ', total_count:', total_count)

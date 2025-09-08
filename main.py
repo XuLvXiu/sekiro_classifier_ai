@@ -36,8 +36,7 @@ eval_transform = transforms.Compose([
     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
 ])
 
-# 0, 1, 2
-arr_action_name = ['IDLE', 'ATTACK', 'PARRY']
+arr_action_name = ['IDLE', 'ATTACK', 'PARRY', 'SHIPO', 'JUMP']
 model = resnet18(weights=ResNet18_Weights.DEFAULT)
 num_classes = len(arr_action_name)
 print('num_classes:', num_classes)
@@ -113,7 +112,7 @@ def main_loop():
             outputs = model(inputs)
             _, predicted = torch.max(outputs, 1)
 
-            # 0, 1, 2
+            # 0, 1, 2, 3, 4
             action_id = predicted.item()
 
         action_name = arr_action_name[action_id]
@@ -151,8 +150,8 @@ def on_press(key):
     global global_is_running
     print('on_press key: ', key)
     try:
-        if key == Key.esc: 
-            log.info('The user presses Esc in the game, will terminate.')
+        if key == Key.backspace: 
+            log.info('The user presses backspace in the game, will terminate.')
             os._exit(0)
 
         # global_current_key = key
@@ -182,7 +181,7 @@ def main():
 
     keyboard_listener = Listener(on_press=on_press)
     keyboard_listener.start()
-    log.info('keyboard listener setup. press Esc to exit')
+    log.info('keyboard listener setup. press backspace to exit')
 
     mouse_listener = mouse.Listener(on_click=on_click)
     mouse_listener.start()
