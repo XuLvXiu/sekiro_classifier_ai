@@ -1,12 +1,9 @@
 #encoding=utf8
 
 '''
-在打游戏的过程中，收集游戏窗口截图、当时按下的按键，
-保存到文件中
-
-
-按 ] 键开始收集，再按一次结束收集
+main
 '''
+print('importing...')
 
 import multiprocessing as mp
 import time
@@ -26,6 +23,34 @@ import os
 import numpy as np
 import pandas as pd
 
+import torch
+import torchvision.transforms as transforms
+from torchvision.models import resnet18, ResNet18_Weights
+from PIL import Image
+
+
+# load model
+eval_transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+])
+
+# 0, 1, 2
+arr_action_name = ['IDLE', 'ATTACK', 'PARRY']
+model = resnet18(weights=ResNet18_Weights.DEFAULT)
+num_classes = len(arr_action_name)
+print('num_classes:', num_classes)
+
+num_ftrs = model.fc.in_features
+model.fc = torch.nn.Linear(num_ftrs, num_classes)
+
+model_file_name = 'model.resnet.v1'
+model.load_state_dict(torch.load(model_file_name))
+model.eval()
+
+if torch.cuda.is_available(): 
+    model = model.cuda()
 
 # Event to control running state
 running_event = mp.Event()
@@ -47,48 +72,7 @@ def wait_for_game_window():
 
 # 动作结束时的回调函数
 def on_action_finished():
-    log.debug("动作执行完毕")
-
-def flush_to_disk(arr_images, arr_keys): 
-    log.info('begin to flush to disk')
-    time_column = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-    if len(arr_images) == 0: 
-        log.info('emtpy data: %s' % (time_column))
-        return
-
-    arr_y = []
-    arr_img_file_i = []
-    for i in range(0, len(arr_images)): 
-        image = arr_images[i]
-        key = arr_keys[i]
-        y = 0
-        if key == mouse.Button.left: 
-            y = 1
-        if key == mouse.Button.right: 
-            y = 2
-        arr_y.append(y)
-        arr_img_file_i.append(i)
-        cv2.imwrite('images/original/%s_%s.png' % (time_column, i), 
-                image, [cv2.IMWRITE_PNG_COMPRESSION, 0])
-
-    # create new df
-    data = {
-        'img_file_i': arr_img_file_i,
-        'key': arr_keys,
-        'y': arr_y,
-    }
-    df = pd.DataFrame(data)
-    df['time'] = time_column
-
-    csv_file_name = 'labels.csv'
-    # read old df from csv file and merge it with the new data
-    if os.path.exists(csv_file_name): 
-        old_df = pd.read_csv(csv_file_name)
-        df = pd.concat([old_df, df])
-
-    df.to_csv(csv_file_name, index=False)
-    log.info('end of flush to disk: %s %s' % (len(arr_images), df.shape[0]))
-
+    log.debug("action execute finished")
 
 global_is_running = False
 def main_loop(): 
@@ -96,19 +80,13 @@ def main_loop():
         log.debug("Failed to detect game window.")
         return
 
-    arr_images = []
-    arr_keys = []
+    executor = ActionExecutor('./config/actions_conf.yaml')
     frame_count = 0
+    PARRY_ACTION_ID = 2
+    previous_action_id = None
     while True: 
         log.info('main loop running')
         if not global_is_running: 
-            # when the collector is not running, flush image and keys data to disk.
-            if len(arr_images) > 0: 
-                flush_to_disk(arr_images, arr_keys)
-                # reset
-                arr_images = []
-                arr_keys = []
-    
             time.sleep(1.0)
             continue
 
@@ -120,8 +98,41 @@ def main_loop():
         BaseWindow.update_all()
 
         image = global_enemy_window.color.copy()
-        arr_images.append(image)
-        arr_keys.append(global_current_key)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        pil_image = Image.fromarray(image)
+        pil_image = eval_transform(pil_image)
+        inputs = pil_image.unsqueeze(0)
+
+        action_id = None
+        with torch.no_grad(): 
+            # inputs: torch.Size([1, 3, 224, 224])
+            # print('inputs:', inputs.shape)
+            if torch.cuda.is_available(): 
+                inputs = inputs.cuda()
+
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs, 1)
+
+            # 0, 1, 2
+            action_id = predicted.item()
+
+        action_name = arr_action_name[action_id]
+        print('previous_action_id: %s, action_id: %s' % (previous_action_id, action_id))
+        '''
+        如果现在要防御, 那么需要判断前一个动作是否为防御，
+            如果前一个动作也为防御，则 IDLE 即可，因为此时还未释放右键
+        如果现在不要防御，那么也需要判断前一个动作是否为防御，
+            如果前一个动作为防御，那么需要释放右键才能进行本次的动作。
+        '''
+        if action_id == PARRY_ACTION_ID and previous_action_id == PARRY_ACTION_ID: 
+            action_name = 'IDLE'
+        if (not action_id == PARRY_ACTION_ID) and previous_action_id == PARRY_ACTION_ID: 
+            executor.take_action('RELEASE_PARRY', action_finished_callback=on_action_finished)
+        executor.take_action(action_name, action_finished_callback=on_action_finished)
+
+        while executor.is_running(): 
+            time.sleep(0.05)
+        previous_action_id = action_id
 
         frame_count += 1
 

@@ -51,7 +51,7 @@ for index, row in df.iterrows():
     img_file_i = row['img_file_i']
     time_colum = row['time']
     y = row['y']
-    img_file_name = '%s_%s.jpg' % (time_colum, img_file_i)
+    img_file_name = '%s_%s.png' % (time_colum, img_file_i)
     obj_file_name_to_y[img_file_name] = y
 
 file_count = 0
@@ -110,7 +110,7 @@ if torch.cuda.is_available():
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-num_epochs = 40
+num_epochs = 30
 
 train_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=num_classes)
 
@@ -184,6 +184,8 @@ with torch.no_grad():
             inputs = inputs.cuda()
             labels = labels.cuda()
 
+        # inputs: torch.Size([8, 3, 224, 224])
+        # print('inputs:', inputs.shape)
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         # total_loss += loss.item()

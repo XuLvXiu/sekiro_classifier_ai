@@ -1,0 +1,357 @@
+actions:
+
+  IDLE:
+    - ['delay', 0.1 ]
+
+  ATTACK: 
+    - ['press_mouse', 'left']
+    - ['delay', 0.1 ]
+    - ['release_mouse', 'left']
+
+  PARRY: 
+    - ['press_mouse', 'right']
+
+  RELEASE_PARRY: 
+    - ['release_mouse', 'right']
+
+  GUI_FUO: &GUI_FUO
+    - ['press', 'p']
+    - ['delay', 0.1]
+    - ['release', 'p']
+
+    - ['delay', 1]
+
+    - ['press', 'down']
+    - ['delay', 0.1]
+    - ['release', 'down']
+
+    - ['delay', 0.5]
+
+    - ['press', 'enter']
+    - ['delay', 0.1]
+    - ['release', 'enter']
+
+    - ['delay', 20]
+
+  EXP_1: 
+    - *GUI_FUO
+
+    - ['press', 'd']
+    - ['delay', 2]
+    - ['release', 'd']
+
+    - ['press', 'w']
+    - ['delay', 2]
+    - ['release', 'w']
+
+    - ['press', 'a']
+    - ['delay', 1]
+    - ['release', 'a']
+
+    - ['press', 'w']
+    - ['delay', 1.5]
+    - ['release', 'w']
+
+    - ['press', 'q']
+    - ['delay', 0.1]
+    - ['release', 'q']
+
+    - ['delay', 0.1]
+
+    - ['press', 'w']
+    - ['delay', 0.2]
+    - ['release', 'w']
+
+    - ['press_mouse', 'left']
+    - ['delay', 0.1]
+    - ['release_mouse', 'left']
+
+    - ['delay', 2]
+
+    - ['press', 'e']
+    - ['delay', 1]
+    - ['release', 'e']
+
+
+  GO_FORWARD:
+    - ['press', 'w']
+    - ['delay', 0.2]
+    - ['press', 'shift']
+    - ['delay', 0.5]
+    - ['release', 'w']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+    - ['delay', 0.1]
+
+  GO_BACK:
+    - ['press', 's']
+    - ['delay', 0.2]
+    - ['press', 'shift']
+    - ['delay', 0.5]
+    - ['release', 's']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+    - ['delay', 0.1]
+
+  IDLE:
+    - ['delay', 0.1 ]
+
+  LIGHT_ATTACK:
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.25]
+  
+  HEAVY_ATTACK:
+    - ['press_mouse', 'right']
+    - ['delay', 0.15]
+    - ['release_mouse', 'right']
+    - ['delay', 2.53]
+  
+  DRINK_POTION:
+    - ['press', 'r']
+    - ['delay', 0.12]
+    - ['release', 'r']
+    - ['delay', 1.37]
+  
+  DODGE: &DODGE
+    - ['press', 'space']
+    - ['delay', 0.16]
+    - ['release', 'space']
+    - ['delay', 0.34]
+
+  DODGE_TWO: &DODGE_TWO
+    - *DODGE
+
+  DODGE_THREE: &DODGE_THREE
+    - *DODGE
+    - *DODGE_TWO
+
+  ATTACK_DODGE:
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.25]
+    - ['press', 'space']
+    - ['delay', 0.16]
+    - ['release', 'space']
+    - ['delay', 0.34]  
+  
+  QIESHOU:
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.25]
+    - ['press_mouse', 'right']
+    - ['delay', 0.15]
+    - ['release_mouse', 'right']
+    - ['delay', 0.96]
+
+  FIVE_HIT_COMBO:
+    - ['press_mouse', 'left']
+    - ['delay', 0.13 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.39]
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.62]
+    - ['press_mouse', 'left']
+    - ['delay', 0.17 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.73]
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 1]
+    - ['press_mouse', 'left']
+    - ['delay', 0.14 ]
+    - ['release_mouse', 'left']
+    - ['delay', 1]
+
+  SKILL_1: &SKILL_1
+    - ['press', '1']
+    - ['delay', 0.16]
+    - ['release', '1']
+    - ['delay', 0.4]
+  
+  SKILL_2: &SKILL_2
+    - ['press', '2']
+    - ['delay', 0.16]
+    - ['release', '2']
+    - ['delay', 0.4]
+  
+  SKILL_3: &SKILL_3
+    - ['press', '3']
+    - ['delay', 0.16]
+    - ['release', '3']
+    - ['delay', 1.96]
+  
+  SKILL_4: &SKILL_4
+    - ['press', '4']
+    - ['delay', 0.16]
+    - ['release', '4']
+    - ['delay', 1.19]
+
+  STEALTH_CHARGE:
+    - *SKILL_2
+    - ['delay', 0.16]
+    - ['press_mouse', 'right']
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 'd']
+    - ['delay', 2.45]
+    - ['release', 'd']
+    - ['press', 'w']
+    - ['delay', 1.45]
+    - ['release', 'w']
+    - ['press', 'a']
+    - ['delay', 1.45]
+    - ['release', 'a']
+    - ['press', 'w']
+    - ['delay', 0.45]
+    - ['release', 'w']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+    - ['release_mouse', 'right']
+    - ['delay', 3.43]
+
+  FABAO:
+    - ['press', 't']
+    - ['delay', 0.16]
+    - ['release', 't']
+    - ['delay', 1.19]
+  
+  TISHEN:
+    - ['press', 'f']
+    - ['delay', 0.16]
+    - ['release', 'f']
+    - ['delay', 4.15]
+
+  MOVE_CAMERA_RIGHT:
+    - ['move_mouse', 300, 0, 1]
+    - ['delay', 1]
+
+  MOVE_CAMERA_LEFT:
+    - ['move_mouse', -300, 0, 1]
+    - ['delay', 1]
+
+  RUN_FORWARD: &RUN_FORWARD
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 'w']
+    - ['delay', 1]
+    - ['release', 'w']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+
+  RUN_BACKWARD: &RUN_BACKWARD
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 's']
+    - ['delay', 1]
+    - ['release', 's']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+
+  RUN_LEFT: &RUN_LEFT
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 'a']
+    - ['delay', 1]
+    - ['release', 'a']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+
+  RUN_RIGHT: &RUN_RIGHT
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 'd']
+    - ['delay', 1]
+    - ['release', 'd']
+    - ['delay', 0.2]
+    - ['release', 'shift']
+
+  SKIP_CG:
+    - ['delay', 1]
+    - ['press', 'e']
+    - ['delay', 3]
+    - ['release', 'e']
+    - ['delay', 4]
+
+  YINHU_RESTART:
+    - ['delay', 0.2]
+    - *RUN_FORWARD
+    - ['delay', 1]
+    - ['press', 'e']
+    - ['delay', 0.5]
+    - ['release', 'e']
+    - ['delay', 6]
+    - ['press', 'down']
+    - ['delay', 0.2]
+    - ['release', 'down']
+    - ['delay', 0.2]
+    - ['press', 'down']
+    - ['delay', 0.2]
+    - ['release', 'down']
+    - ['delay', 1]
+    - ['press', 'e']
+    - ['delay', 0.5]
+    - ['release', 'e']
+    - ['delay', 2]
+    - ['press', 'e']
+    - ['delay', 3]
+    - ['release', 'e']
+    - ['delay', 6]
+    - *RUN_FORWARD
+  
+  GUANGZHI_RUSHV3_RESTART:
+    - ['delay', 0.2]
+    - *RUN_FORWARD
+    - *RUN_FORWARD
+    - *RUN_FORWARD
+    - *RUN_FORWARD
+
+  HUXIANFENG_RUSHV3_RESTART:
+    - ['delay', 0.2]
+    - ['press', 'shift']
+    - ['delay', 0.2]
+    - ['press', 'w']
+    - ['delay', 7]
+    - ['release', 'w']
+    - ['delay', 0.2]
+
+  # 官方复战专用
+  FUZHAN_STAND_RESTART:
+    - ['press', 'e']
+    - ['delay', 0.2]
+    - ['release', 'e']
+    - ['delay', 22] # 加载时长
+
+
+no_interrupts:
+  - STEALTH_CHARGE
+  - LIGHT_ATTACK
+  - DODGE
+  - IDLE
+
+hot_list:
+  - IDLE # 什么也不做
+  - LIGHT_ATTACK # 左击
+  - HEAVY_ATTACK # 右击
+  - DODGE # 闪避
+  - DODGE_TWO # 连续闪避2
+  - DODGE_THREE # 连续闪避3
+  - ATTACK_DODGE # 攻击+闪避
+  - QIESHOU # 切手攻击
+  - FIVE_HIT_COMBO # 五连左击
+  - SKILL_1 # 技能1
+  - STEALTH_CHARGE # 技能2隐身躲避+蓄力重击
+  - SKILL_3 # 技能3
+  - FABAO # 法宝
+  - TISHEN # F 变身技能
+  - GO_BACK # 后退
+  - GO_FORWARD # 前进
+  - DRINK_POTION # 恢复血量
+
+
