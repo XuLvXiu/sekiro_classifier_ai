@@ -3,6 +3,7 @@
 train the classifier model
 '''
 
+print('importing...')
 import os
 import shutil
 import random
@@ -20,7 +21,14 @@ import torchmetrics
 # step 1: rearrange images
 df = pd.read_csv('labels.csv')
 arr_y_grouped_count = df.groupby('y')['time'].count()
+min_count = min(arr_y_grouped_count)
 print('arr_y_grouped_count: \n', arr_y_grouped_count)
+print('min:', min_count)
+arr_keep_ratio = []
+for i in range(0, len(arr_y_grouped_count)): 
+    arr_keep_ratio.append(min_count / arr_y_grouped_count[i])
+
+print('keep ratio:', arr_keep_ratio)
 
 print('rearrange images...')
 original_dir = 'images/original'
@@ -55,6 +63,11 @@ for file_name in os.listdir(original_dir):
         to_dir = test_dir
 
     y = obj_file_name_to_y[file_name]
+
+    keep_ratio = arr_keep_ratio[y]
+    if random.random() > keep_ratio: 
+        continue
+
     to_path = '%s/%s/%s' % (to_dir, y, file_name)
     from_path = '%s/%s' % (original_dir, file_name)
     shutil.copyfile(from_path, to_path)
