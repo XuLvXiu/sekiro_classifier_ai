@@ -38,7 +38,8 @@ eval_transform = transforms.Compose([
 
 arr_action_name = ['IDLE', 'ATTACK', 'PARRY', 'SHIPO', 'JUMP']
 model = resnet18(weights=ResNet18_Weights.DEFAULT)
-num_classes = len(arr_action_name)
+# -1 是因为弦一郎一阶段不需要 jump 
+num_classes = len(arr_action_name) - 1
 print('num_classes:', num_classes)
 
 num_ftrs = model.fc.in_features
@@ -58,6 +59,7 @@ running_event = mp.Event()
 def signal_handler(sig, frame):
     log.debug("Gracefully exiting...")
     running_event.clear()
+    executor.interrupt_action()
     sys.exit(0)
 
 def wait_for_game_window():
@@ -65,6 +67,23 @@ def wait_for_game_window():
         frame = grabscreen.grab_screen()
         if frame is not None and window.set_windows_offset(frame):
             log.debug("Game window detected and offsets set!")
+
+            BaseWindow.set_frame(frame)
+            BaseWindow.update_all()
+
+            log.debug('waiting for model loading...')
+            image = global_enemy_window.color.copy()
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            pil_image = Image.fromarray(image)
+            pil_image = eval_transform(pil_image)
+            inputs = pil_image.unsqueeze(0)
+
+            with torch.no_grad(): 
+                if torch.cuda.is_available(): 
+                    inputs = inputs.cuda()
+
+                outputs = model(inputs)
+
             return True
         time.sleep(1)
     return False
@@ -74,18 +93,21 @@ def on_action_finished():
     log.debug("action execute finished")
 
 global_is_running = False
+executor = ActionExecutor('./config/actions_conf.yaml')
+
 def main_loop(): 
     if not wait_for_game_window():
         log.debug("Failed to detect game window.")
         return
 
-    executor = ActionExecutor('./config/actions_conf.yaml')
     frame_count = 0
+    ATTACK_ACTION_ID = 1
     PARRY_ACTION_ID = 2
     previous_action_id = None
     while True: 
         log.info('main loop running')
         if not global_is_running: 
+            previous_action_id = None
             time.sleep(1.0)
             continue
 
@@ -115,8 +137,26 @@ def main_loop():
             # 0, 1, 2, 3, 4
             action_id = predicted.item()
 
+            # no idle
+            # if you want to idle, please parry.
+            if action_id == 0: 
+                action_id = PARRY_ACTION_ID
+
+            '''
+            # 不贪刀
+            if action_id == ATTACK_ACTION_ID and previous_action_id == ATTACK_ACTION_ID: 
+                action_id = PARRY_ACTION_ID
+            '''
+
         action_name = arr_action_name[action_id]
-        print('previous_action_id: %s, action_id: %s' % (previous_action_id, action_id))
+
+        '''
+        # 多贪一刀
+        if action_name == 'ATTACK': 
+            action_name = 'DOUBLE_ATTACK'
+        '''
+
+        log.debug('previous_action_id: %s, action_id: %s' % (previous_action_id, action_id))
         '''
         如果现在要防御, 那么需要判断前一个动作是否为防御，
             如果前一个动作也为防御，则 IDLE 即可，因为此时还未释放右键
@@ -126,7 +166,14 @@ def main_loop():
         if action_id == PARRY_ACTION_ID and previous_action_id == PARRY_ACTION_ID: 
             action_name = 'IDLE'
         if (not action_id == PARRY_ACTION_ID) and previous_action_id == PARRY_ACTION_ID: 
+            log.debug('take_action: %s' % ('RELEASE_PARRY'))
             executor.take_action('RELEASE_PARRY', action_finished_callback=on_action_finished)
+            '''
+            while executor.is_running(): 
+                time.sleep(0.02)
+            '''
+
+        log.debug('take_action: %s' % (action_name))
         executor.take_action(action_name, action_finished_callback=on_action_finished)
 
         while executor.is_running(): 
@@ -144,14 +191,15 @@ def main_loop():
         '''
 
 
-global_current_key = None
+# global_current_key = None
 def on_press(key):
     # global global_current_key
     global global_is_running
-    print('on_press key: ', key)
+    # print('on_press key: ', key)
     try:
         if key == Key.backspace: 
             log.info('The user presses backspace in the game, will terminate.')
+            executor.interrupt_action()
             os._exit(0)
 
         # global_current_key = key
@@ -160,21 +208,23 @@ def on_press(key):
             # switch the switch
             if global_is_running: 
                 global_is_running = False
+                executor.interrupt_action()
             else: 
                 global_is_running = True
 
     except Exception as e:
         print(e)
 
+'''
 def on_click(x, y, button, pressed): 
     global global_current_key
     if pressed: 
-        print('on_click click button:', button)
+        # print('on_click click button:', button)
         global_current_key = button
     else: 
-        print('on_click release button:', button)
+        # print('on_click release button:', button)
         global_current_key = None
-
+'''
 
 def main():
     signal.signal(signal.SIGINT, signal_handler)
@@ -183,9 +233,11 @@ def main():
     keyboard_listener.start()
     log.info('keyboard listener setup. press backspace to exit')
 
+    '''
     mouse_listener = mouse.Listener(on_click=on_click)
     mouse_listener.start()
     log.info('mouse listener setup.')
+    '''
 
     # Initialize camera
     grabscreen.init_camera(target_fps=5)

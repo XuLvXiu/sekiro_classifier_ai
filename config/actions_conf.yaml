@@ -4,15 +4,32 @@ actions:
     - ['delay', 0.1 ]
 
   ATTACK: 
+    - ['press', 'w']
     - ['press_mouse', 'left']
     - ['delay', 0.1 ]
     - ['release_mouse', 'left']
+    - ['release', 'w']
+
+  DOUBLE_ATTACK: 
+    - ['press', 'w']
+    - ['press_mouse', 'left']
+    - ['delay', 0.1 ]
+    - ['release_mouse', 'left']
+    - ['delay', 0.1 ]
+    - ['press_mouse', 'left']
+    - ['delay', 0.1 ]
+    - ['release_mouse', 'left']
+    - ['release', 'w']
 
   PARRY: 
     - ['press_mouse', 'right']
+    - ['press', 'w']
+    - ['press_mouse', 'right']
+    - ['delay', 0.1 ]
 
   RELEASE_PARRY: 
     - ['release_mouse', 'right']
+    - ['release', 'w']
 
   SHIPO: 
     - ['press', 'space']

@@ -26,7 +26,7 @@ print('arr_y_grouped_count: \n', arr_y_grouped_count)
 print('min:', min_count)
 arr_keep_ratio = []
 for i in range(0, len(arr_y_grouped_count)): 
-    arr_keep_ratio.append(min_count / arr_y_grouped_count[i])
+    arr_keep_ratio.append(2 * min_count / arr_y_grouped_count[i])
 
 print('keep ratio:', arr_keep_ratio)
 

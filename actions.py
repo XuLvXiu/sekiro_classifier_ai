@@ -125,7 +125,7 @@ class ActionExecutor:
 
     def _press_key(self, key):
         """按下键盘按键并记录"""
-        print('press key:', key)
+        log.debug('press key: %s' % (key))
         if self.interrupt_event.is_set():
             return
         # 判断 key 是否为特殊键
@@ -136,7 +136,7 @@ class ActionExecutor:
         self.pressed_keys.add(key)  # 记录按下的键
 
     def _release_key(self, key):
-        print('release key:', key)
+        log.debug('release key: %s' % (key))
         """释放键盘按键并从记录中移除"""
         if self.interrupt_event.is_set():
             return
@@ -149,7 +149,7 @@ class ActionExecutor:
 
     def _press_mouse(self, button):
         """按下鼠标按钮并记录"""
-        print('press mouse:', button)
+        log.debug('press mouse: %s' % (button))
         if self.interrupt_event.is_set():
             return
         if button == "left":
@@ -165,7 +165,7 @@ class ActionExecutor:
 
     def _release_mouse(self, button):
         """释放鼠标按钮并从记录中移除"""
-        print('release mouse:', button)
+        log.debug('release mouse: %s' % (button))
         if self.interrupt_event.is_set():
             return
         if button == "left":
